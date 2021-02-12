@@ -196,3 +196,30 @@ def get_tree_5_game():
     expected_score = 4
     expected_move = LT
     return TreeGame("Test 5", "A", transactions, heuristic, math.inf), expected_score, expected_move
+
+#============================================================================
+# See image tree_6.png
+# http://homepage.ufp.pt/jtorres/ensino/ia/alfabeta.html
+#============================================================================
+def get_tree_6_game():
+    # currentState : {move1 : nextState1, move2 : nextState2}
+    transactions = {
+        'A' : {LT :'B', CT: 'C', RT :'D'},
+        'B' : {LT :'E', CT: 'F', RT :'G'},
+        'C' : {LT :'H', CT: 'I', RT :'L'},
+        'D' : {LT :'M', CT: 'N', RT :'O'}
+    }
+    heuristic = {
+            'E':-1,
+            'F':0,
+            'G':-10,
+            'H':2,
+            'I':4,
+            'L':6,
+            'M':14,
+            'N':5,
+            'O':70
+        }
+    expected_score = 5
+    expected_move = RT
+    return TreeGame("Test 6", "A", transactions, heuristic, 2), expected_score, expected_move

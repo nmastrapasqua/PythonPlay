@@ -2,7 +2,7 @@ import unittest
 from minmaxm import find_best_move
 import math
 from tree_game import get_tree_1_game, get_tree_2_game, get_tree_3_game, get_tree_4_game
-from tree_game import get_tree_5_game
+from tree_game import get_tree_5_game, get_tree_6_game
 
 class TestMinMax(unittest.TestCase):
 
@@ -32,6 +32,12 @@ class TestMinMax(unittest.TestCase):
 
     def test_tree_5(self):
         game, expected_score, expected_move = get_tree_5_game()
+        score, move = find_best_move(game)
+        self.assertEqual(score, expected_score)
+        self.assertEqual(move, expected_move)
+
+    def test_tree_6(self):
+        game, expected_score, expected_move = get_tree_6_game()
         score, move = find_best_move(game)
         self.assertEqual(score, expected_score)
         self.assertEqual(move, expected_move)

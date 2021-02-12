@@ -16,17 +16,17 @@ def minimax(game, depth, maximizingPlayer, alpha, beta):
 	score = game.evaluate()
 
 	# If Maximizer has won the game return his/her 
-    # evaluated score 
+	# evaluated score 
 	if game.check_win(True):
 		return score
 
 	# If Minimizer has won the game return his/her 
-    # evaluated score 
+	# evaluated score 
 	if game.check_win(False):
 		return score 
 
 	# If there are no more moves and no winner then 
-    # it is a tie
+	# it is a tie
 	if not game.is_moves_left():
 		return score
 
