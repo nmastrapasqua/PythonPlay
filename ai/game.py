@@ -6,7 +6,7 @@ class Game(ABC):
         self.gameName = gameName
 
     @abstractmethod
-    def evaluate(self):
+    def evaluate(self, player):
         pass
 
     @abstractmethod    

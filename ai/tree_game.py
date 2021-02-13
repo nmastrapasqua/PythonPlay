@@ -14,8 +14,8 @@ class TreeGame(Game):
         self.max_depth = max_depth
         self.undo_stack = LifoQueue()
 
-    def evaluate(self, defaultval=0):
-        return self.heuristic.get(self.status, defaultval)
+    def evaluate(self, player):
+        return self.heuristic.get(self.status, 0)
 
     def check_win(self, player):
         return False

@@ -1,5 +1,6 @@
 import unittest
 from test_minmax import TestMinMax
+from test_tic_tac_toe_class import TestTicTacToeClass
 
 def suite():
     """
@@ -7,6 +8,7 @@ def suite():
     """
     test_suite = unittest.TestSuite()
     test_suite.addTest(unittest.makeSuite(TestMinMax))
+    #test_suite.addTest(unittest.makeSuite(TestTicTacToeClass))
     return test_suite
 
 mySuit = suite()
