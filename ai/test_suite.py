@@ -8,7 +8,7 @@ def suite():
     """
     test_suite = unittest.TestSuite()
     test_suite.addTest(unittest.makeSuite(TestMinMax))
-    #test_suite.addTest(unittest.makeSuite(TestTicTacToeClass))
+    test_suite.addTest(unittest.makeSuite(TestTicTacToeClass))
     return test_suite
 
 mySuit = suite()

@@ -13,7 +13,7 @@ MAX, MIN = math.inf, -math.inf
 #(Initially called for root and maximizer) 
 #=======================================================================================
 def minimax(game, depth, maximizingPlayer, alpha, beta): 
-	score = game.evaluate(maximizingPlayer)
+	score = game.evaluate(depth)
 
 	# If Maximizer has won the game return his/her 
 	# evaluated score 
