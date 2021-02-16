@@ -25,10 +25,6 @@ class Game(ABC):
         pass
 
     @abstractmethod
-    def depth(self):
-        pass
-
-    @abstractmethod
     def do_move(self, move, playerId):
         pass
 

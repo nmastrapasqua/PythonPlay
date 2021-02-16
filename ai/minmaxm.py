@@ -12,7 +12,7 @@ MAX, MIN = math.inf, -math.inf
 # Returns optimal value for current player 
 #(Initially called for root and maximizer) 
 #=======================================================================================
-def minimax(game, depth, maximizingPlayer, playerId, eval, alpha, beta):
+def minimax(game, depth, maximizingPlayer, playerId, eval, max_depth, alpha, beta):
 	opponentId = game.get_opponent(playerId)
 	score = eval(game, depth)
 
@@ -33,7 +33,7 @@ def minimax(game, depth, maximizingPlayer, playerId, eval, alpha, beta):
 
 	# Terminating condition. i.e 
 	# max depth is reached 
-	if depth == game.depth(): 
+	if depth == max_depth: 
 		return score 
 
 	if maximizingPlayer: 
@@ -45,7 +45,7 @@ def minimax(game, depth, maximizingPlayer, playerId, eval, alpha, beta):
 			# Make the move 
 			game.do_move(move, playerId)
 
-			val = minimax(game, depth + 1, False, playerId, eval, alpha, beta) 
+			val = minimax(game, depth + 1, False, playerId, eval, max_depth, alpha, beta) 
 			best = max(best, val) 
 			alpha = max(alpha, best) 
 
@@ -66,7 +66,7 @@ def minimax(game, depth, maximizingPlayer, playerId, eval, alpha, beta):
 			# Make the move 
 			game.do_move(move, opponentId)
 
-			val = minimax(game, depth + 1, True, playerId, eval, alpha, beta) 
+			val = minimax(game, depth + 1, True, playerId, eval, max_depth, alpha, beta) 
 			best = min(best, val) 
 			beta = min(beta, best) 
 
@@ -82,13 +82,13 @@ def minimax(game, depth, maximizingPlayer, playerId, eval, alpha, beta):
 #=======================================================================================
 # This will return the best possible move for the player 
 #=======================================================================================
-def find_best_move(game, playerId, eval):
+def find_best_move(game, playerId, eval, max_depth):
 	bestVal = -math.inf
 	bestMove = None
 
 	for move in game.valid_moves():
 		game.do_move(move, playerId)
-		moveVal = minimax(game, 0, False, playerId, eval, -math.inf, math.inf)
+		moveVal = minimax(game, 0, False, playerId, eval, max_depth, -math.inf, math.inf)
 		game.undo()
 		if moveVal > bestVal:
 			bestMove = move

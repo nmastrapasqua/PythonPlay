@@ -19,17 +19,16 @@ class TreePlayer(Player):
         return self.heuristic.get(board.get_status(), 0)
 
     def play(self):
-        return find_best_move(self.game, self.id, self.evaluate)
+        return find_best_move(self.game, self.id, self.evaluate, math.inf)
 
 #============================================================================
 # class TreeGame
 #============================================================================
 class TreeGame(Game):
-    def __init__(self, name, startState, transactions, max_depth):
+    def __init__(self, name, startState, transactions):
         super().__init__(name)
         self.status = startState
         self.transactions = transactions
-        self.max_depth = max_depth
         self.undo_stack = LifoQueue()
 
     def get_status(self):
@@ -46,9 +45,6 @@ class TreeGame(Game):
 
     def valid_moves(self):
         return self.transactions[self.status]
-        
-    def depth(self):
-        return self.max_depth
 
     def do_move(self, move, playerId):
         self.undo_stack.put(self.status)
@@ -93,7 +89,7 @@ def get_tree_1_game():
             'P':0,
             'Q':-1
         }
-    game = TreeGame("Test 1", "A", transactions, 3)
+    game = TreeGame("Test 1", "A", transactions)
     player = TreePlayer('W', game, heuristic)
     expected_sore = 5
     expected_move = LT
@@ -124,7 +120,7 @@ def get_tree_2_game():
             'P':7,
             'Q':5
         }
-    game = TreeGame("Test 2", "A", transactions, 3)
+    game = TreeGame("Test 2", "A", transactions)
     player = TreePlayer('W', game, heuristic)
     expected_sore = 3
     expected_move = LT
@@ -153,7 +149,7 @@ def get_tree_3_game():
             '28':2,
             '29':1
         }
-    game = TreeGame("Test 3", "01", transactions, 2)
+    game = TreeGame("Test 3", "01", transactions)
     player = TreePlayer('W', game, heuristic)
     expected_score = 7
     expected_move = LT
@@ -191,7 +187,7 @@ def get_tree_4_game():
             'T':2,
             'U':0
         }
-    game = TreeGame("Test 4", "A", transactions, 3)
+    game = TreeGame("Test 4", "A", transactions)
     player = TreePlayer('W', game, heuristic)
     expected_score = 6
     expected_move = LT
@@ -222,7 +218,7 @@ def get_tree_5_game():
             'K':3,
             'L':8
         }
-    game = TreeGame("Test 5", "A", transactions, math.inf)
+    game = TreeGame("Test 5", "A", transactions)
     player = TreePlayer('W', game, heuristic)
     expected_score = 4
     expected_move = LT
@@ -251,7 +247,7 @@ def get_tree_6_game():
             'N':5,
             'O':70
         }
-    game = TreeGame("Test 6", "A", transactions, 2)
+    game = TreeGame("Test 6", "A", transactions)
     player = TreePlayer('W', game, heuristic)
     expected_score = 5
     expected_move = RT

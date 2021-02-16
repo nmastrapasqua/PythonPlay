@@ -16,7 +16,7 @@ class SimpleMiniMaxPlayer(Player):
         super().__init__(id)
 
     def do_move(self, board):
-        _, move = find_best_move(board, self.id, self.evaluate)
+        _, move = find_best_move(board, self.id, self.evaluate, math.inf)
         if move is not None:
             board.do_move(move, self.id)
 
@@ -45,10 +45,9 @@ THREE_IN_A_ROW = [
 # Class TicTacToeGame
 #============================================================================
 class TicTacToeGame(Game):
-    def __init__(self, player1, player2, max_depth=math.inf):
+    def __init__(self, player1, player2):
         super().__init__("Tic Tac Toe")
         self.board = [EMPTY for i in range(0, 9)]
-        self.max_depth = max_depth
         self.undo_stack = LifoQueue()
         self.player1 = player1
         self.player2 = player2
@@ -79,9 +78,6 @@ class TicTacToeGame(Game):
 
     def valid_moves(self):
         return [i for i, e in enumerate(self.board) if e == EMPTY]
-        
-    def depth(self):
-        return self.max_depth
 
     def do_move(self, move, playerId):
         if not self.board[move] == EMPTY:
