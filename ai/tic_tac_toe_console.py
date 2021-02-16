@@ -1,9 +1,9 @@
-from tic_tac_toe_game import TicTacToeGame
-from game import AIMaxPlayer, ConsoleHumanPlayer, Match
+from tic_tac_toe_game import TicTacToeGame, SimpleMiniMaxPlayer
+from game import ConsoleHumanPlayer, Match
 
-aiPlayer = AIMaxPlayer('X')
+aiPlayer = SimpleMiniMaxPlayer('X')
 hPlayer = ConsoleHumanPlayer('O')
-game = TicTacToeGame(aiPlayer.get_symbol(), hPlayer.get_symbol())
+game = TicTacToeGame(aiPlayer.get_id(), hPlayer.get_id())
 match = None
 
 first_player = str(input("First player (x/o) : "))

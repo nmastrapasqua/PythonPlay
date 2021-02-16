@@ -2,10 +2,32 @@
 # heuristic from:
 # https://www.youtube.com/watch?v=trKjYdBASyQ
 #=============================================================================
-from game import Game
+from game import Game, Player
 from queue import LifoQueue
 from exception import MoveNotAllowedException
 import math
+from minmaxm import find_best_move
+
+#============================================================================
+# SimpleMiniMaxPlayer class for Tic Tac Toe Game
+#============================================================================
+class SimpleMiniMaxPlayer(Player):
+    def __init__(self, id):
+        super().__init__(id)
+
+    def do_move(self, board):
+        _, move = find_best_move(board, self.id, self.evaluate)
+        if move is not None:
+            board.do_move(move, self.id)
+
+    def evaluate(self, board, actual_depth):
+        if board.check_win(self.id):
+            return 10 - actual_depth
+        elif board.check_win(board.get_opponent(self.id)):
+            return -10 + actual_depth
+        else:
+            return 0
+
 
 EMPTY = '_'
 
@@ -23,33 +45,25 @@ THREE_IN_A_ROW = [
 # Class TicTacToeGame
 #============================================================================
 class TicTacToeGame(Game):
-    def __init__(self, maxSymbol, minSymbol, max_depth=math.inf):
+    def __init__(self, player1, player2, max_depth=math.inf):
         super().__init__("Tic Tac Toe")
         self.board = [EMPTY for i in range(0, 9)]
         self.max_depth = max_depth
         self.undo_stack = LifoQueue()
-        self.symbolMap = {
-            True  : maxSymbol, 
-            False : minSymbol
-        }
+        self.player1 = player1
+        self.player2 = player2
 
-    def evaluate(self, actual_depth):
-        if self.check_win(True):
-            return 10 - actual_depth
-        elif self.check_win(False):
-            return -10 + actual_depth
-        else:
-            return 0
+    def get_opponent(self, playerId):
+        return self.player2 if self.player1 == playerId else self.player1
 
-    def check_win(self, player):
-        player_sym = self.symbolMap[player]
+    def check_win(self, playerId):
         piece = None
 
         for i in range(0, 8):
             players = 0
             for j in range(0, 3):
                 piece = self.board[THREE_IN_A_ROW[i][j]]
-                if piece == player_sym:
+                if piece == playerId:
                     players += 1
                     if players == 3:
                         return True
@@ -69,11 +83,11 @@ class TicTacToeGame(Game):
     def depth(self):
         return self.max_depth
 
-    def do_move(self, move, player):
+    def do_move(self, move, playerId):
         if not self.board[move] == EMPTY:
             raise MoveNotAllowedException(f"The position on the board is occupied by {self.board[move]}")
         self.undo_stack.put({'move' : move, 'symbol' : self.board[move]})
-        self.board[move] = self.symbolMap[player]
+        self.board[move] = playerId
 
     def undo(self):
         previous = self.undo_stack.get()

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from minmaxm import find_best_move
 
 #============================================================================
 # Game class
@@ -10,11 +9,11 @@ class Game(ABC):
         self.gameName = gameName
 
     @abstractmethod
-    def evaluate(self, actual_depth):
+    def get_opponent(self, playerId):
         pass
 
     @abstractmethod    
-    def check_win(self, player):
+    def check_win(self, playerId):
         pass
 
     @abstractmethod
@@ -30,7 +29,7 @@ class Game(ABC):
         pass
 
     @abstractmethod
-    def do_move(self, move, player):
+    def do_move(self, move, playerId):
         pass
 
     @abstractmethod    
@@ -45,48 +44,39 @@ class Game(ABC):
 # Base Player class
 #============================================================================
 class Player(ABC):
-    def __init__(self, symbol, maximizingPlayer):
-        self.symbol = symbol
-        self.maximizingPlayer = maximizingPlayer
+    def __init__(self, id):
+        self.id = id
 
-    def get_symbol(self):
-        return self.symbol
-
-    def is_max(self):
-        return self.maximizingPlayer
+    def get_id(self):
+        return self.id
 
     @abstractmethod
     def do_move(self, board):
         pass
 
-#============================================================================
-# AIMaxPlayer class
-#============================================================================
-class AIMaxPlayer(Player):
-    def __init__(self, symbol):
-        super().__init__(symbol, True)
-
-    def do_move(self, board):
-        _, move = find_best_move(board)
-        if move is not None:
-            board.do_move(move, self.maximizingPlayer)
+    @abstractmethod
+    def evaluate(self, board, id, actual_depth):
+        pass
 
 #============================================================================
 # ConsoleHumanPlayer class
 #============================================================================
 class ConsoleHumanPlayer(Player):
-    def __init__(self, symbol):
-        super().__init__(symbol, False)
+    def __init__(self, id):
+        super().__init__(id)
 
     def do_move(self, board):
         print(board.to_string())
         while True:
             try:
                 choice = int(input("make your move : "))
-                board.do_move(choice, self.maximizingPlayer)
+                board.do_move(choice, self.id)
                 break
             except Exception:
                 print('Please, peek a valid move...')
+
+    def evaluate(self, board, id, actual_depth):
+        return 0
 
 #============================================================================
 # Match class
@@ -107,13 +97,13 @@ class Match():
                 if not self.game.is_moves_left():
                     gameover = True
                     break
-                if self.game.check_win(player.is_max()):
+                if self.game.check_win(player.get_id()):
                     gameover = True
                     break
 
         for player in self.players:
-            if self.game.check_win(player.is_max()):
-                return player.get_symbol()
+            if self.game.check_win(player.get_id()):
+                return player.get_id()
         
         return DRAW
         

@@ -12,17 +12,18 @@ MAX, MIN = math.inf, -math.inf
 # Returns optimal value for current player 
 #(Initially called for root and maximizer) 
 #=======================================================================================
-def minimax(game, depth, maximizingPlayer, alpha, beta): 
-	score = game.evaluate(depth)
+def minimax(game, depth, maximizingPlayer, playerId, eval, alpha, beta):
+	opponentId = game.get_opponent(playerId)
+	score = eval(game, depth)
 
 	# If Maximizer has won the game return his/her 
 	# evaluated score 
-	if game.check_win(True):
+	if game.check_win(playerId):
 		return score
 
 	# If Minimizer has won the game return his/her 
 	# evaluated score 
-	if game.check_win(False):
+	if game.check_win(opponentId):
 		return score 
 
 	# If there are no more moves and no winner then 
@@ -42,9 +43,9 @@ def minimax(game, depth, maximizingPlayer, alpha, beta):
 		# Recur for valid moves 
 		for move in game.valid_moves(): 
 			# Make the move 
-			game.do_move(move, True)
+			game.do_move(move, playerId)
 
-			val = minimax(game, depth + 1, False, alpha, beta) 
+			val = minimax(game, depth + 1, False, playerId, eval, alpha, beta) 
 			best = max(best, val) 
 			alpha = max(alpha, best) 
 
@@ -63,9 +64,9 @@ def minimax(game, depth, maximizingPlayer, alpha, beta):
 		# Recur for valid moves 
 		for move in game.valid_moves(): 
 			# Make the move 
-			game.do_move(move, False)
+			game.do_move(move, opponentId)
 
-			val = minimax(game, depth + 1, True, alpha, beta) 
+			val = minimax(game, depth + 1, True, playerId, eval, alpha, beta) 
 			best = min(best, val) 
 			beta = min(beta, best) 
 
@@ -81,13 +82,13 @@ def minimax(game, depth, maximizingPlayer, alpha, beta):
 #=======================================================================================
 # This will return the best possible move for the player 
 #=======================================================================================
-def find_best_move(game):
+def find_best_move(game, playerId, eval):
 	bestVal = -math.inf
 	bestMove = None
 
 	for move in game.valid_moves():
-		game.do_move(move, True)
-		moveVal = minimax(game, 0, False, -math.inf, math.inf)
+		game.do_move(move, playerId)
+		moveVal = minimax(game, 0, False, playerId, eval, -math.inf, math.inf)
 		game.undo()
 		if moveVal > bestVal:
 			bestMove = move

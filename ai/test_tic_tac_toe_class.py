@@ -1,108 +1,132 @@
 import unittest
-from tic_tac_toe_game import TicTacToeGame
+from tic_tac_toe_game import TicTacToeGame, SimpleMiniMaxPlayer
+from game import Player, Match, DRAW
+
+class DummyPlayer(Player):
+    def __init__(self, id):
+        super().__init__(id)
+
+    def evaluate(self, board, id, actual_depth):
+        return 0
+
+    def do_move(self, board):
+        pass
 
 class TestTicTacToeClass(unittest.TestCase):
 
+    def setUp(self):
+        minMaxplayer = SimpleMiniMaxPlayer('X')
+        self.playerId = minMaxplayer.get_id()
+        self.opponentId = DummyPlayer('O').get_id()
+        self.game = TicTacToeGame(self.playerId, self.opponentId)
+        self.eval = minMaxplayer.evaluate
+
     def test_evaluate(self):
-        game = TicTacToeGame('X', 'O')
-        game.do_move(0, True)
-        game.do_move(4, True)
-        game.do_move(8, True)
-        self.assertEqual(game.evaluate(0), 10)
-        self.assertEqual(game.evaluate(2), 8)
+        
+        self.game.do_move(0, self.playerId)
+        self.game.do_move(4, self.playerId)
+        self.game.do_move(8, self.playerId)
+        self.assertEqual(self.eval(self.game, 0), 10)
+        self.assertEqual(self.eval(self.game, 2), 8)
+        
+        self.game.undo()
+        self.game.undo()
+        self.game.undo()
+        self.assertEqual(self.eval(self.game, 0), 0)
+        self.assertEqual(self.eval(self.game, 2), 0)
 
-        game.undo()
-        game.undo()
-        game.undo()
-        self.assertEqual(game.evaluate(0), 0)
-        self.assertEqual(game.evaluate(2), 0)
-
-        game.do_move(0, False)
-        game.do_move(1, False)
-        game.do_move(2, False)
-        self.assertEqual(game.evaluate(0), -10)
-        self.assertEqual(game.evaluate(2), -8)
+        self.game.do_move(0, self.opponentId)
+        self.game.do_move(1, self.opponentId)
+        self.game.do_move(2, self.opponentId)
+        self.assertEqual(self.eval(self.game, 0), -10)
+        self.assertEqual(self.eval(self.game, 2), -8)
 
     def test_valid_moves(self):
-        game = TicTacToeGame('X', 'O')
-        moves = game.valid_moves()
+        moves = self.game.valid_moves()
         expected = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         self.assertListEqual(moves, expected)
         
-        game.do_move(2, False)
-        moves = game.valid_moves()
+        self.game.do_move(2, self.opponentId)
+        moves = self.game.valid_moves()
         expected = [0, 1, 3, 4, 5, 6, 7, 8]
         self.assertListEqual(moves, expected)
 
-        game.do_move(8, True)
-        moves = game.valid_moves()
+        self.game.do_move(8, self.playerId)
+        moves = self.game.valid_moves()
         expected = [0, 1, 3, 4, 5, 6, 7]
         self.assertListEqual(moves, expected)
 
     def test_is_moves_left(self):
-        game = TicTacToeGame('X', 'O')
-        self.assertEqual(game.is_moves_left(), True)
+        self.assertEqual(self.game.is_moves_left(), True)
 
-        game.do_move(0, True)
-        self.assertEqual(game.is_moves_left(), True)
+        self.game.do_move(0, self.playerId)
+        self.assertEqual(self.game.is_moves_left(), True)
 
         for i in range(1, 9):
-            self.assertEqual(game.is_moves_left(), True)
-            game.do_move(i, True)
+            self.assertEqual(self.game.is_moves_left(), True)
+            self.game.do_move(i, self.playerId)
 
-        self.assertEqual(game.is_moves_left(), False)
+        self.assertEqual(self.game.is_moves_left(), False)
 
     def test_undo(self):
-        game = TicTacToeGame('X', 'O')
-        game.do_move(0, True)
-        moves = game.valid_moves()
+        self.game.do_move(0, self.playerId)
+        moves = self.game.valid_moves()
         expected = [1, 2, 3, 4, 5, 6, 7, 8]
         self.assertListEqual(moves, expected)
 
-        game.undo()
+        self.game.undo()
         expected = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        moves = game.valid_moves()
+        moves = self.game.valid_moves()
         self.assertListEqual(moves, expected)
 
-        game.do_move(0, True)
-        game.do_move(1, True)
-        game.do_move(2, True)
-        moves = game.valid_moves()
+        self.game.do_move(0, self.playerId)
+        self.game.do_move(1, self.playerId)
+        self.game.do_move(2, self.playerId)
+        moves = self.game.valid_moves()
         expected = [3, 4, 5, 6, 7, 8]
         self.assertListEqual(moves, expected)
 
-        game.undo()
-        moves = game.valid_moves()
+        self.game.undo()
+        moves = self.game.valid_moves()
         expected = [2, 3, 4, 5, 6, 7, 8]
         self.assertListEqual(moves, expected)
 
-        game.undo()
-        moves = game.valid_moves()
+        self.game.undo()
+        moves = self.game.valid_moves()
         expected = [1, 2, 3, 4, 5, 6, 7, 8]
         self.assertListEqual(moves, expected)
 
-        game.undo()
-        moves = game.valid_moves()
+        self.game.undo()
+        moves = self.game.valid_moves()
         expected = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         self.assertListEqual(moves, expected)
 
     def test_check_win(self):
-        game = TicTacToeGame('X', 'O')
-        game.do_move(0, True)
-        game.do_move(4, True)
-        game.do_move(8, True)
-        self.assertEqual(game.check_win(True), True)
-        self.assertEqual(game.check_win(False), False)
+        self.game.do_move(0, self.playerId)
+        self.game.do_move(4, self.playerId)
+        self.game.do_move(8, self.playerId)
+        self.assertEqual(self.game.check_win(self.playerId), True)
+        self.assertEqual(self.game.check_win(self.opponentId), False)
 
-        game.undo()
-        self.assertEqual(game.check_win(True), False)
-        self.assertEqual(game.check_win(False), False)
+        self.game.undo()
+        self.assertEqual(self.game.check_win(self.playerId), False)
+        self.assertEqual(self.game.check_win(self.opponentId), False)
+
+    def test_ai_vs_ai(self):
+        player1 = SimpleMiniMaxPlayer('X')
+        player2 = SimpleMiniMaxPlayer('O')
+
+        game = TicTacToeGame(player1.get_id(), player2.get_id())
+
+        match = Match(game, player1, player2)
+        outcome = match.run()
+
+        self.assertEqual(outcome, DRAW)
 
     @unittest.expectedFailure
     def test_not_allowed_move(self):
-        game = TicTacToeGame('X', 'O')
-        game.do_move(0, True)
-        game.do_move(0, False)
+        self.game.do_move(0, self.playerId)
+        self.game.do_move(0, self.opponentId)
 
 if __name__ == '__main__':
     unittest.main()
