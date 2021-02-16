@@ -55,7 +55,7 @@ class Player(ABC):
         pass
 
     @abstractmethod
-    def evaluate(self, board, id, actual_depth):
+    def evaluate(self, board, actual_depth):
         pass
 
 #============================================================================
@@ -75,7 +75,7 @@ class ConsoleHumanPlayer(Player):
             except Exception:
                 print('Please, peek a valid move...')
 
-    def evaluate(self, board, id, actual_depth):
+    def evaluate(self, board, actual_depth):
         return 0
 
 #============================================================================
