@@ -1,23 +1,13 @@
 import unittest
 from tic_tac_toe_game import TicTacToeGame, SimpleMiniMaxPlayer
-from game import Player, Match, DRAW
-
-class DummyPlayer(Player):
-    def __init__(self, id):
-        super().__init__(id)
-
-    def evaluate(self, board, id, actual_depth):
-        return 0
-
-    def do_move(self, board):
-        pass
+from game import RandomPlayer, Match, DRAW
 
 class TestTicTacToeClass(unittest.TestCase):
 
     def setUp(self):
         minMaxplayer = SimpleMiniMaxPlayer('X')
         self.playerId = minMaxplayer.get_id()
-        self.opponentId = DummyPlayer('O').get_id()
+        self.opponentId = RandomPlayer('O').get_id()
         self.game = TicTacToeGame(self.playerId, self.opponentId)
         self.eval = minMaxplayer.evaluate
 
@@ -122,6 +112,17 @@ class TestTicTacToeClass(unittest.TestCase):
         outcome = match.run()
 
         self.assertEqual(outcome, DRAW)
+
+    def test_ai_vs_random(self):
+        player1 = SimpleMiniMaxPlayer('X')
+        player2 = RandomPlayer('O')
+
+        game = TicTacToeGame(player1.get_id(), player2.get_id())
+
+        match = Match(game, player1, player2)
+        outcome = match.run()
+
+        self.assertFalse(outcome == player2.get_id())
 
     @unittest.expectedFailure
     def test_not_allowed_move(self):

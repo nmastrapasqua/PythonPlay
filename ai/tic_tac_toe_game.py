@@ -6,7 +6,7 @@ from game import Game, Player
 from queue import LifoQueue
 from exception import MoveNotAllowedException
 import math
-from minmaxm import find_best_move
+from minmaxm import MiniMax
 
 #============================================================================
 # SimpleMiniMaxPlayer class for Tic Tac Toe Game
@@ -14,9 +14,10 @@ from minmaxm import find_best_move
 class SimpleMiniMaxPlayer(Player):
     def __init__(self, id):
         super().__init__(id)
+        self.minimax = MiniMax(self.id, self.evaluate, math.inf)
 
     def do_move(self, board):
-        _, move = find_best_move(board, self.id, self.evaluate, math.inf)
+        _, move = self.minimax.find_best_move(board)
         if move is not None:
             board.do_move(move, self.id)
 

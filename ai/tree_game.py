@@ -1,7 +1,7 @@
 from game import Game, Player
 from queue import LifoQueue
 import math
-from minmaxm import find_best_move
+from minmaxm import MiniMax
 
 #============================================================================
 # class TreePlayer
@@ -11,15 +11,13 @@ class TreePlayer(Player):
         super().__init__(id)
         self.game = game
         self.heuristic = heuristic
+        self.minimax = MiniMax(self.id, self.evaluate, math.inf)
 
     def do_move(self, board):
-        pass
+        return self.minimax.find_best_move(self.game)
 
     def evaluate(self, board, actual_depth):
-        return self.heuristic.get(board.get_status(), 0)
-
-    def play(self):
-        return find_best_move(self.game, self.id, self.evaluate, math.inf)
+        return self.heuristic.get(board.get_status(), 0)        
 
 #============================================================================
 # class TreeGame

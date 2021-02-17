@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import random
 
 #============================================================================
 # Game class
@@ -71,6 +72,24 @@ class ConsoleHumanPlayer(Player):
             except Exception:
                 print('Please, peek a valid move...')
 
+    def evaluate(self, board, actual_depth):
+        return 0
+
+#============================================================================
+# RandomPlayer class
+#============================================================================
+class RandomPlayer(Player):
+    def __init__(self, id):
+        super().__init__(id)
+
+    def do_move(self, board):
+        moves = board.valid_moves()
+        if moves is None or len(moves) == 0:
+            return
+        index = random.randint(0, len(moves)-1)
+        move = moves[index]
+        board.do_move(move, self.id)
+        
     def evaluate(self, board, actual_depth):
         return 0
 
