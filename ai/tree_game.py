@@ -7,14 +7,13 @@ from minmaxm import MiniMax
 # class TreePlayer
 #============================================================================
 class TreePlayer(Player):
-    def __init__(self, id, game, heuristic):
+    def __init__(self, id, heuristic):
         super().__init__(id)
-        self.game = game
         self.heuristic = heuristic
         self.minimax = MiniMax(self.id, self.evaluate, math.inf)
 
     def do_move(self, board):
-        return self.minimax.find_best_move(self.game)
+        return self.minimax.find_best_move(board)
 
     def evaluate(self, board, actual_depth):
         return self.heuristic.get(board.get_status(), 0)        
@@ -88,10 +87,10 @@ def get_tree_1_game():
             'Q':-1
         }
     game = TreeGame("Test 1", "A", transactions)
-    player = TreePlayer('W', game, heuristic)
+    player = TreePlayer('W', heuristic)
     expected_sore = 5
     expected_move = LT
-    return expected_sore, expected_move, player
+    return game, expected_sore, expected_move, player
 
 #============================================================================
 # See image tree_2.png
@@ -119,10 +118,10 @@ def get_tree_2_game():
             'Q':5
         }
     game = TreeGame("Test 2", "A", transactions)
-    player = TreePlayer('W', game, heuristic)
+    player = TreePlayer('W', heuristic)
     expected_sore = 3
     expected_move = LT
-    return expected_sore, expected_move, player
+    return game, expected_sore, expected_move, player
 
 #============================================================================
 # See image tree_3.png
@@ -148,10 +147,10 @@ def get_tree_3_game():
             '29':1
         }
     game = TreeGame("Test 3", "01", transactions)
-    player = TreePlayer('W', game, heuristic)
+    player = TreePlayer('W', heuristic)
     expected_score = 7
     expected_move = LT
-    return expected_score, expected_move, player
+    return game, expected_score, expected_move, player
 
 
 #============================================================================
@@ -186,10 +185,10 @@ def get_tree_4_game():
             'U':0
         }
     game = TreeGame("Test 4", "A", transactions)
-    player = TreePlayer('W', game, heuristic)
+    player = TreePlayer('W', heuristic)
     expected_score = 6
     expected_move = LT
-    return expected_score, expected_move, player
+    return game, expected_score, expected_move, player
 
 #============================================================================
 # See image tree_5.png
@@ -217,10 +216,10 @@ def get_tree_5_game():
             'L':8
         }
     game = TreeGame("Test 5", "A", transactions)
-    player = TreePlayer('W', game, heuristic)
+    player = TreePlayer('W', heuristic)
     expected_score = 4
     expected_move = LT
-    return expected_score, expected_move, player
+    return game, expected_score, expected_move, player
 
 #============================================================================
 # See image tree_6.png
@@ -246,7 +245,7 @@ def get_tree_6_game():
             'O':70
         }
     game = TreeGame("Test 6", "A", transactions)
-    player = TreePlayer('W', game, heuristic)
+    player = TreePlayer('W', heuristic)
     expected_score = 5
     expected_move = RT
-    return expected_score, expected_move, player
+    return game, expected_score, expected_move, player
