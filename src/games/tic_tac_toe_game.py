@@ -2,24 +2,29 @@
 # heuristic from:
 # https://www.youtube.com/watch?v=trKjYdBASyQ
 #=============================================================================
-from game import Game, Player
+from games.game import Game, Player
 from queue import LifoQueue
-from exception import MoveNotAllowedException
+from games.exception import MoveNotAllowedException
 import math
-from minmaxm import MiniMax
+from ai.minmaxm import MiniMax
 
 #============================================================================
 # SimpleMiniMaxPlayer class for Tic Tac Toe Game
 #============================================================================
 class SimpleMiniMaxPlayer(Player):
-    def __init__(self, id):
+    def __init__(self, id, max_depth=math.inf):
         super().__init__(id)
-        self.minimax = MiniMax(self.id, self.evaluate, math.inf)
+        self.minimax = MiniMax(self.id, self.evaluate, max_depth)
 
     def do_move(self, board):
+        # speedup first move
+        if len(board.valid_moves()) == 9:
+            board.do_move(0, self.id)
+            return 0
         _, move = self.minimax.find_best_move(board)
         if move is not None:
             board.do_move(move, self.id)
+        return move
 
     def evaluate(self, board, actual_depth):
         if board.check_win(self.id):
@@ -46,9 +51,9 @@ THREE_IN_A_ROW = [
 # Class TicTacToeGame
 #============================================================================
 class TicTacToeGame(Game):
-    def __init__(self, player1, player2):
+    def __init__(self, player1, player2, board=None):
         super().__init__("Tic Tac Toe")
-        self.board = [EMPTY for i in range(0, 9)]
+        self.board = [EMPTY for i in range(0, 9)] if board is None else board
         self.undo_stack = LifoQueue()
         self.player1 = player1
         self.player2 = player2

@@ -3,6 +3,7 @@
 import pygame, sys
 from pygame.locals import *
 import random, time
+import os
 
 #Initialzing 
 pygame.init()
@@ -25,7 +26,7 @@ SPEED = 5
 SCORE = 0
 
 # Media path
-MEDIA_PATH = 'images/fulltutorial'
+MEDIA_PATH = f'{os.getcwd()}/src/pygames/images/fulltutorial'
 
 #Setting up Fonts
 font = pygame.font.SysFont("Verdana", 60)

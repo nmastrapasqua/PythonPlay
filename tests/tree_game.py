@@ -1,7 +1,7 @@
-from game import Game, Player
+from games.game import Game, Player
 from queue import LifoQueue
 import math
-from minmaxm import MiniMax
+from ai.minmaxm import MiniMax
 
 #============================================================================
 # class TreePlayer

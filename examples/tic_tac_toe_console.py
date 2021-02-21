@@ -1,5 +1,5 @@
-from tic_tac_toe_game import TicTacToeGame, SimpleMiniMaxPlayer
-from game import ConsoleHumanPlayer, Match
+from games.tic_tac_toe_game import TicTacToeGame, SimpleMiniMaxPlayer
+from games.game import ConsoleHumanPlayer, Match
 
 aiPlayer = SimpleMiniMaxPlayer('X')
 hPlayer = ConsoleHumanPlayer('O')

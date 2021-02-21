@@ -1,3 +1,5 @@
-ai/__pycache__
-pygames/.venv
-pygames/.vscode
+src/ai/__pycache__
+src/games/__pycache__
+tests/__pycache__
+.venv
+.vscode
