@@ -207,8 +207,6 @@ def drawXO(row, col):
 	
 	else: 
 		screen.blit(o_img, (posy, posx)) 
-	
-	pg.display.update() 
 
 def user_click(): 
 	# get coordinates of mouse click 
@@ -244,11 +242,9 @@ def user_click():
 	# we need to draw the images at 
 	# the desired positions 
 	if(row and col and board[row-1][col-1] is None): 
-		global XO 
-		drawXO(row, col)
-		return True
+		return row, col
 
-	return False
+	return None, None
 		
 def reset_game(startup): 
 	global board, winner, XO, draw
@@ -321,7 +317,9 @@ def getHumanMove():
 				pg.quit() 
 				sys.exit() 
 			elif event.type == MOUSEBUTTONDOWN: 
-				if user_click():
+				row, col = user_click()
+				if row and col:
+					drawXO(row, col)
 					return
 	
 if __name__ == '__main__':
