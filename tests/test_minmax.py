@@ -1,6 +1,6 @@
 import unittest
-from tree_game import get_tree_1_game, get_tree_2_game, get_tree_3_game, get_tree_4_game
-from tree_game import get_tree_5_game, get_tree_6_game
+from tests.test_game import get_tree_1_game, get_tree_2_game, get_tree_3_game, get_tree_4_game
+from tests.test_game import get_tree_5_game, get_tree_6_game
 
 class TestMinMax(unittest.TestCase):
 

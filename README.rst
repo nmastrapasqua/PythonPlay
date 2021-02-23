@@ -25,6 +25,8 @@ Acknowledgements
 
 * `Tic Tac Toe GUI In Python using PyGame`_
 
+* `Connect Four Python Game Tutorial with pygame`_
+
 * `Python pygame – The Full Tutorial`_
 
 * `Invent Your Own Computer Games with Python`_
@@ -36,4 +38,5 @@ Acknowledgements
 .. _`Python pygame – The Full Tutorial`: https://coderslegacy.com/python/python-pygame-tutorial/
 .. _`Invent Your Own Computer Games with Python`: https://amzn.to/2XXwrV6
 .. _`A sample Python project`: https://github.com/pypa/sampleproject
+.. _`Connect Four Python Game Tutorial with pygame`: https://www.youtube.com/watch?v=XpYz-q1lxu8
 

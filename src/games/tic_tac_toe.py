@@ -51,15 +51,18 @@ THREE_IN_A_ROW = [
 # Class TicTacToeGame
 #============================================================================
 class TicTacToeGame(Game):
-    def __init__(self, player1, player2, board=None):
+    def __init__(self, player1, player2):
         super().__init__("Tic Tac Toe")
-        self.board = [EMPTY for i in range(0, 9)] if board is None else board
+        self.board = [EMPTY for i in range(0, 9)]
         self.undo_stack = LifoQueue()
         self.player1 = player1
         self.player2 = player2
 
     def get_opponent(self, playerId):
         return self.player2 if self.player1 == playerId else self.player1
+
+    def get_board(self):
+        return self.board
 
     def check_win(self, playerId):
         piece = None

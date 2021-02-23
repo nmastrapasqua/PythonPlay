@@ -1,6 +1,6 @@
 import unittest
-from test_minmax import TestMinMax
-from test_tic_tac_toe_class import TestTicTacToeClass
+from tests.test_minmax import TestMinMax
+from tests.test_tic_tac_toe import TestTicTacToeClass
 
 def suite():
     """

@@ -9,21 +9,11 @@ import time
 import random
 from pygame.locals import *
 import numpy as np
-from games.tic_tac_toe_game import SimpleMiniMaxPlayer, TicTacToeGame
+from games.tic_tac_toe import SimpleMiniMaxPlayer, TicTacToeGame
+from games.game import DRAW
 import os
 
 # declaring the global variables 
-
-# for storing the 'x' or 'o' 
-# value as character 
-XO = None
-
-# storing the winner's value at 
-# any instant of code 
-winner = None
-
-# to check if the game is a draw 
-draw = None
 
 # to set width of the game window 
 width = 400
@@ -39,10 +29,6 @@ white = (255, 255, 255)
 # white game board, dividing board 
 # into 9 parts 
 line_color = (0, 0, 0) 
-
-# setting up a 3 * 3 board in canvas 
-board = [[None]*3, [None]*3, [None]*3] 
-
 
 # initializing the pygame window 
 pg.init() 
@@ -62,7 +48,7 @@ screen = pg.display.set_mode((width, height + 100), 0, 32)
 pg.display.set_caption("My Tic Tac Toe") 
 
 # Media path
-MEDIA_PATH = f'{os.getcwd()}/src/pygames/images/tictactoe'
+MEDIA_PATH = f'{os.getcwd()}/examples/images/tictactoe'
 
 # loading the images as python object 
 initiating_window = pg.image.load(f"{MEDIA_PATH}/modified_cover.png") 
@@ -74,10 +60,37 @@ initiating_window = pg.transform.scale(initiating_window, (width, height + 100))
 x_img = pg.transform.scale(x_img, (80, 80)) 
 o_img = pg.transform.scale(y_img, (80, 80)) 
 
+# for storing the 'x' or 'o' 
+# value as character 
+XO = None
 HUMAN = 'o'
 COMPUTER = 'x'
+# 0 dummy, 10 super smart
 DIFFICULTY = 10
 computerPlayer = SimpleMiniMaxPlayer(COMPUTER, DIFFICULTY)
+game = None
+move2Point = [[1,1], [1,2], [1,3], [2,1], [2,2], [2,3], [3,1], [3,2], [3,3]]
+point2Move = [ [0, 1, 2],
+               [3, 4, 5],
+			   [6, 7, 8]]
+
+def get_point(move):
+	row = move2Point[move][0]
+	col = move2Point[move][1]
+	return row, col
+
+def get_move(row, col):
+	return point2Move[row-1][col-1]
+
+def is_game_over():
+	if game.check_win(COMPUTER):
+		return COMPUTER
+	elif game.check_win(HUMAN):
+		return HUMAN
+	elif not game.is_moves_left():
+		return DRAW
+	else:
+		return None
 
 def game_initiating_window(startup): 
 	
@@ -101,17 +114,15 @@ def game_initiating_window(startup):
 
 def draw_status(): 
 	
-	# getting the global variable draw 
-	# into action 
-	global draw 
+	outcome = is_game_over()
 	
-	if winner is None: 
+	if outcome is None: 
 		message = "Computer's Turn" if XO == COMPUTER else "Human's Turn"
+	elif outcome == DRAW:
+		message = "Game Draw !"
 	else: 
 		message = "Computer won !" if XO == COMPUTER else "Human won !"
-	if draw: 
-		message = "Game Draw !"
-
+		
 	# setting a font object 
 	font = pg.font.Font(None, 30) 
 	
@@ -126,46 +137,7 @@ def draw_status():
 	screen.blit(text, text_rect) 
 	pg.display.update() 
 	
-def check_win(): 
-	global board, winner, draw 
-
-	# checking for winning rows 
-	for row in range(0, 3): 
-		if((board[row][0] == board[row][1] == board[row][2]) and (board [row][0] is not None)): 
-			winner = board[row][0] 
-			pg.draw.line(screen, (250, 0, 0), 
-						(0, (row + 1)*height / 3 -height / 6), 
-						(width, (row + 1)*height / 3 - height / 6 ), 
-						4) 
-			break
-
-	# checking for winning columns 
-	for col in range(0, 3): 
-		if((board[0][col] == board[1][col] == board[2][col]) and (board[0][col] is not None)): 
-			winner = board[0][col] 
-			pg.draw.line (screen, (250, 0, 0), ((col + 1)* width / 3 - width / 6, 0), \
-						((col + 1)* width / 3 - width / 6, height), 4) 
-			break
-
-	# check for diagonal winners 
-	if (board[0][0] == board[1][1] == board[2][2]) and (board[0][0] is not None): 
-		
-		# game won diagonally left to right 
-		winner = board[0][0] 
-		pg.draw.line (screen, (250, 70, 70), (50, 50), (350, 350), 4) 
-		
-	if (board[0][2] == board[1][1] == board[2][0]) and (board[0][2] is not None): 
-		
-		# game won diagonally right to left 
-		winner = board[0][2] 
-		pg.draw.line (screen, (250, 70, 70), (350, 50), (50, 350), 4) 
-
-	if(all([all(row) for row in board]) and winner is None ): 
-		draw = True
-	
-def drawXO(row, col): 
-	global board, XO 
-	
+def drawXO(row, col):
 	# for the first row, the image 
 	# should be pasted at a x coordinate 
 	# of 30 from the left margin 
@@ -193,10 +165,6 @@ def drawXO(row, col):
 	if col == 3: 
 		posy = height / 3 * 2 + 30
 		
-	# setting up the required board 
-	# value to display 
-	board[row-1][col-1] = XO 
-	
 	if(XO == COMPUTER): 
 		
 		# pasting x_img over the screen 
@@ -238,25 +206,42 @@ def user_click():
 	else: 
 		row = None
 		
-	# after getting the row and col, 
-	# we need to draw the images at 
-	# the desired positions 
-	if(row and col and board[row-1][col-1] is None): 
-		return row, col
+	return row, col
 
-	return None, None
+def draw_win(): 
+	board = np.reshape(game.get_board(), (3, 3)).tolist()
+
+	# checking for winning rows 
+	for row in range(0, 3): 
+		if((board[row][0] == board[row][1] == board[row][2]) and (board [row][0] is not None)): 
+			pg.draw.line(screen, (250, 0, 0), 
+						(0, (row + 1)*height / 3 -height / 6), 
+						(width, (row + 1)*height / 3 - height / 6 ), 
+						4) 
+			break
+
+	# checking for winning columns 
+	for col in range(0, 3): 
+		if((board[0][col] == board[1][col] == board[2][col]) and (board[0][col] is not None)): 
+			pg.draw.line (screen, (250, 0, 0), ((col + 1)* width / 3 - width / 6, 0), \
+						((col + 1)* width / 3 - width / 6, height), 4) 
+			break
+
+	# check for diagonal winners 
+	if (board[0][0] == board[1][1] == board[2][2]) and (board[0][0] is not None): 
+		# game won diagonally left to right 
+		pg.draw.line (screen, (250, 70, 70), (50, 50), (350, 350), 4) 
+		
+	if (board[0][2] == board[1][1] == board[2][0]) and (board[0][2] is not None): 
+		# game won diagonally right to left 
+		pg.draw.line (screen, (250, 70, 70), (350, 50), (50, 350), 4) 
 		
 def reset_game(startup): 
-	global board, winner, XO, draw
+	global XO, game
 	XO = COMPUTER if random.randint(0, 1) == 0 else HUMAN
-	draw = False
 	game_initiating_window(startup)
-	winner = None
-	board = [[None]*3, [None]*3, [None]*3] 
+	game = TicTacToeGame(COMPUTER, HUMAN)
 
-#============================================================================
-# My Stuff
-#============================================================================
 def main():
 	startup = True
 	while True:
@@ -272,23 +257,21 @@ def runGame(startup):
 		if XO == COMPUTER:
 			# Computer player's turn.
 			getComputerMove()
-			check_win()
-			if winner or draw:
+			if is_game_over():
+				draw_win()
 				break
 			XO = HUMAN
 		else:
 			# Human player's turn.
 			getHumanMove()
-			check_win()
-			if winner or draw:
+			if is_game_over():
+				draw_win()
 				break
 			XO = COMPUTER
 			
 	# Keep looping until player clicks the mouse or quits.
 	while(True):
 		draw_status() 
-		pg.display.update() 
-		CLOCK.tick(fps) 
 		for event in pg.event.get(): 
 			if event.type == QUIT: 
 				pg.quit() 
@@ -297,18 +280,10 @@ def runGame(startup):
 				return
 
 def getComputerMove():
-	global board
-	
-	board_array = np.reshape(board, (1, 9))[0].tolist()
-	board_array = ['_' if x is None else x for x in board_array]
-
-	game = TicTacToeGame(COMPUTER, HUMAN, board_array)
 	move = computerPlayer.do_move(game)
 	if move is not None:
-		converter = [[1,1], [1,2], [1,3], [2,1], [2,2], [2,3], [3,1], [3,2], [3,3]]
-		drawXO(converter[move][0], converter[move][1])
-		board_array = [None if x == '_' else x for x in board_array]
-		board = np.reshape(board_array, (3, 3)).tolist()
+		row, col = get_point(move)
+		drawXO(row, col)
 
 def getHumanMove():
 	while True:
@@ -318,9 +293,13 @@ def getHumanMove():
 				sys.exit() 
 			elif event.type == MOUSEBUTTONDOWN: 
 				row, col = user_click()
-				if row and col:
+				try:
+					move = get_move(row, col)
+					game.do_move(move, HUMAN)
 					drawXO(row, col)
 					return
+				except Exception as ex:
+					print(f'Error : {ex}')
 	
 if __name__ == '__main__':
     main()

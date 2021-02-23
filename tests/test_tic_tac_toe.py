@@ -1,5 +1,5 @@
 import unittest
-from games.tic_tac_toe_game import TicTacToeGame, SimpleMiniMaxPlayer
+from games.tic_tac_toe import TicTacToeGame, SimpleMiniMaxPlayer
 from games.game import RandomPlayer, Match, DRAW
 
 class TestTicTacToeClass(unittest.TestCase):
