@@ -1,8 +1,9 @@
 import unittest
-from games.connect_four import ConnectFourGame, NONE
+from games.connect_four import ConnectFourGame
 
-RED = 'R'
-YELLOW = 'Y'
+EMPTY = 0
+RED = 1
+YELLOW = 2
 
 class TestConnectFourClass(unittest.TestCase):
 
@@ -43,10 +44,19 @@ class TestConnectFourClass(unittest.TestCase):
         self.game.do_move(4, RED)
 
         board = self.game.get_board()
-        self.assertEqual(board[4][5], RED)
+        self.assertEqual(board[0][4], RED)
 
         self.game.undo()
-        self.assertEqual(board[4][5], NONE)
+        self.assertEqual(board[0][4], EMPTY)
+
+    def test_get_winner(self):
+        self.game.do_move(0, RED)
+        self.game.do_move(0, RED)
+        self.game.do_move(0, RED)
+        self.game.do_move(0, RED)
+        self.assertEqual(self.game.check_win(RED), True)
+        self.assertEqual(self.game.check_win(YELLOW), False)
+        
 
 
 if __name__ == '__main__':

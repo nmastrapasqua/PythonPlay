@@ -7,22 +7,21 @@ from games.game import Game, Player
 from queue import LifoQueue
 from games.exception import MoveNotAllowedException
 from itertools import groupby, chain
+import numpy as np
 
-NONE = '.'
 
 #============================================================================
 # Class ConnectFourGame
 #============================================================================
 class ConnectFourGame(Game):
-    def __init__(self, player1, player2, cols = 7, rows = 6, requiredToWin = 4):
+    def __init__(self, player1, player2, rows = 6, cols = 7):
         super().__init__("Connect Four")
-        self.board = [[NONE] * rows for _ in range(cols)]
+        self.board = np.zeros((rows, cols))
         self.undo_stack = LifoQueue()
         self.player1 = player1
         self.player2 = player2
-        self.cols = cols
         self.rows = rows
-        self.win = requiredToWin
+        self.cols = cols
 
     def get_opponent(self, playerId):
         return self.player2 if self.player1 == playerId else self.player1
@@ -31,72 +30,63 @@ class ConnectFourGame(Game):
         return self.board
 
     def check_win(self, playerId):
-        if self.get_winner():
-            return self.get_winner() == playerId
+        # Check horizontal locations for win
+        for c in range(self.cols-3):
+            for r in range(self.rows):
+                if self.board[r][c] == playerId and self.board[r][c+1] == playerId and self.board[r][c+2] == playerId and self.board[r][c+3] == playerId:
+                    return True
+
+        # Check vertical locations for win
+        for c in range(self.cols):
+            for r in range(self.rows-3):
+                if self.board[r][c] == playerId and self.board[r+1][c] == playerId and self.board[r+2][c] == playerId and self.board[r+3][c] == playerId:
+                    return True
+
+        # Check positively sloped diaganols
+        for c in range(self.cols-3):
+            for r in range(self.rows-3):
+                if self.board[r][c] == playerId and self.board[r+1][c+1] == playerId and self.board[r+2][c+2] == playerId and self.board[r+3][c+3] == playerId:
+                    return True
+
+        # Check negatively sloped diaganols
+        for c in range(self.cols-3):
+            for r in range(3, self.rows):
+                if self.board[r][c] == playerId and self.board[r-1][c+1] == playerId and self.board[r-2][c+2] == playerId and self.board[r-3][c+3] == playerId:
+                    return True
+
         return False
 
     def is_moves_left(self):
         return len(self.valid_moves()) > 0
 
     def valid_moves(self):
-        moves = []
-        last_pos = 0
-        for col in self.board:
-            if col[0] == NONE:
-                moves.append(self.board.index(col, last_pos))
-            last_pos += 1
-        return moves
+        valid_locations = []
+        for col in range(self.cols):
+            if self.board[self.rows-1][col] == 0:
+                valid_locations.append(col)
+        return valid_locations
 
     def do_move(self, move, playerId):
-        #Insert the color in the given column.
-        c = self.board[move]
-        if c[0] != NONE:
+        row = None
+        for r in range(self.rows):
+            if self.board[r][move] == 0:
+                row = r
+                break
+
+        if row is None:
             raise MoveNotAllowedException('Column is full')
 
-        i = -1
-        while c[i] != NONE:
-            i -= 1
-        self.undo_stack.put({'col' : move, 'row': i, 'symbol' : self.board[move][i]})
-        c[i] = playerId
+        self.undo_stack.put({'col' : move, 'row': row, 'symbol' : self.board[row][move]})
+        self.board[row][move] = playerId
 
     def undo(self):
         previous = self.undo_stack.get()
         col = previous['col']
         row = previous['row']
         piece = previous['symbol']
-        self.board[col][row] = piece
+        self.board[row][col] = piece
 
     def to_string(self):
         #Print the board.
-        result = '  '.join(map(str, range(self.cols)))
-        result += '\n'
-        for y in range(self.rows):
-            result += '  '.join(str(self.board[x][y]) for x in range(self.cols))
-            result += '\n'
+        result = np.flip(self.board, 0)
         return result
-
-    def diagonals_pos(self):
-	    # Get positive diagonals, going from bottom-left to top-right.
-	    for di in ([(j, i - j) for j in range(self.cols)] for i in range(self.cols + self.rows -1)):
-		    yield [self.board[i][j] for i, j in di if i >= 0 and j >= 0 and i < self.cols and j < self.rows]
-
-    def diagonals_neg(self):
-	    # Get negative diagonals, going from top-left to bottom-right.
-	    for di in ([(j, i - self.cols + j + 1) for j in range(self.cols)] for i in range(self.cols + self.rows - 1)):
-		    yield [self.board[i][j] for i, j in di if i >= 0 and j >= 0 and i < self.cols and j < self.rows]
-
-    def get_winner(self):
-		#Get the winner on the current board.
-        lines = (
-			self.board, # columns
-			zip(*self.board), # rows
-			self.diagonals_pos(), # positive diagonals
-			self.diagonals_neg() # negative diagonals
-		)
-
-        for line in chain(*lines):
-            for color, group in groupby(line):
-                if color != NONE and len(list(group)) >= self.win:
-                    return color
-
-        return None

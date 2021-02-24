@@ -27,8 +27,6 @@ Acknowledgements
 
 * `Connect Four Python Game Tutorial with pygame`_
 
-* `A simple Connect Four game in Python`_
-
 * `Python pygame – The Full Tutorial`_
 
 * `Invent Your Own Computer Games with Python`_
@@ -41,5 +39,5 @@ Acknowledgements
 .. _`Invent Your Own Computer Games with Python`: https://amzn.to/2XXwrV6
 .. _`A sample Python project`: https://github.com/pypa/sampleproject
 .. _`Connect Four Python Game Tutorial with pygame`: https://www.youtube.com/watch?v=XpYz-q1lxu8
-.. _`A simple Connect Four game in Python`: https://gist.github.com/poke/6934842
+
 
