@@ -7,10 +7,91 @@ from games.game import Game, Player
 from queue import LifoQueue
 from games.exception import MoveNotAllowedException
 import numpy as np
+from ai.minmaxm import MiniMax
 
 EMPTY = 0
 RED = 1
 YELLOW = 2
+WINDOW_LENGTH = 4
+WIN_SCORE = 100000000000000
+
+#============================================================================
+# MiniMaxPlayer class for Connect Four Game
+#============================================================================
+class MiniMaxPlayer(Player):
+    def __init__(self, id, max_depth=2):
+        super().__init__(id)
+        self.minimax = MiniMax(self.id, self.evaluate, max_depth)
+
+    def do_move(self, game):
+        _, move = self.minimax.find_best_move(game)
+        if move is not None:
+            game.do_move(move, self.id)
+        return move
+
+    def evaluate(self, game, actual_depth):
+        opponentId = game.get_opponent(self.id)
+
+        if game.check_win(self.id):
+            return WIN_SCORE
+
+        elif game.check_win(opponentId):
+            return -WIN_SCORE
+
+        else:
+            return self.score_position(game)
+
+    def score_position(self, game):
+        board = game.get_board()
+        score = 0
+
+        ## Score center column
+        center_array = [int(i) for i in list(board[:, game.get_cols()//2])]
+        center_count = center_array.count(self.id)
+        score += center_count * 3
+
+        ## Score Horizontal
+        for r in range(game.get_rows()):
+            row_array = [int(i) for i in list(board[r,:])]
+            for c in range(game.get_cols()-3):
+                window = row_array[c:c+WINDOW_LENGTH]
+                score += self.evaluate_window(window, game)
+
+        ## Score Vertical
+        for c in range(game.get_cols()):
+            col_array = [int(i) for i in list(board[:,c])]
+            for r in range(game.get_rows()-3):
+                window = col_array[r:r+WINDOW_LENGTH]
+                score += self.evaluate_window(window, game)
+
+        ## Score posiive sloped diagonal
+        for r in range(game.get_rows()-3):
+            for c in range(game.get_cols()-3):
+                window = [board[r+i][c+i] for i in range(WINDOW_LENGTH)]
+                score += self.evaluate_window(window, game)
+
+        for r in range(game.get_rows()-3):
+            for c in range(game.get_cols()-3):
+                window = [board[r+3-i][c+i] for i in range(WINDOW_LENGTH)]
+                score += self.evaluate_window(window, game)
+
+        return score
+
+    def evaluate_window(self, window, game):
+        score = 0
+        opp_piece = game.get_opponent(self.id)
+
+        if window.count(self.id) == 4:
+            score += 100
+        elif window.count(self.id) == 3 and window.count(EMPTY) == 1:
+            score += 5
+        elif window.count(self.id) == 2 and window.count(EMPTY) == 2:
+            score += 2
+
+        if window.count(opp_piece) == 3 and window.count(EMPTY) == 1:
+            score -= 4
+
+        return score
 
 #============================================================================
 # Class ConnectFourGame
@@ -92,3 +173,9 @@ class ConnectFourGame(Game):
         #Print the board.
         result = np.flip(self.board, 0)
         return result
+
+    def get_rows(self):
+        return self.rows
+
+    def get_cols(self):
+        return self.cols

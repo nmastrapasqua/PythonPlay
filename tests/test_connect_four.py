@@ -1,5 +1,5 @@
 import unittest
-from games.connect_four import ConnectFourGame, EMPTY, RED, YELLOW
+from games.connect_four import ConnectFourGame, MiniMaxPlayer, EMPTY, RED, YELLOW
 
 
 
@@ -7,6 +7,7 @@ class TestConnectFourClass(unittest.TestCase):
 
     def setUp(self):
         self.game = ConnectFourGame(RED, YELLOW)
+        self.aiPlayer = MiniMaxPlayer(YELLOW)
     
     def test_is_moves_left(self):
         self.assertEqual(self.game.is_moves_left(), True)
@@ -113,6 +114,14 @@ class TestConnectFourClass(unittest.TestCase):
 
         self.assertEqual(self.game.check_win(RED), False)
         self.assertEqual(self.game.check_win(YELLOW), True)
+
+    def test_evaluate(self):
+        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 0)
+
+        self.game.do_move(3, self.aiPlayer.get_id())
+        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 3)
+        self.game.do_move(3, self.aiPlayer.get_id())
+        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 8)
 
 if __name__ == '__main__':
     unittest.main()
