@@ -1,14 +1,16 @@
 #=============================================================================
 # Origin:
-# https://gist.github.com/poke/6934842
+# https://www.youtube.com/watch?v=XpYz-q1lxu8
 #=============================================================================
 
 from games.game import Game, Player
 from queue import LifoQueue
 from games.exception import MoveNotAllowedException
-from itertools import groupby, chain
 import numpy as np
 
+EMPTY = 0
+RED = 1
+YELLOW = 2
 
 #============================================================================
 # Class ConnectFourGame
