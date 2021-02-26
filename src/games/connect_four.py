@@ -10,9 +10,9 @@ import numpy as np
 from ai.minmaxm import MiniMax
 
 EMPTY = 0
-RED = 1
-YELLOW = 2
-WINDOW_LENGTH = 4
+PLAYER_PIECE = 1
+AI_PIECE = 2
+DRAW = 3
 WIN_SCORE = 100000000000000
 
 #============================================================================
@@ -44,6 +44,7 @@ class MiniMaxPlayer(Player):
     def score_position(self, game):
         board = game.get_board()
         score = 0
+        window_len = game.get_window_length()
 
         ## Score center column
         center_array = [int(i) for i in list(board[:, game.get_cols()//2])]
@@ -54,25 +55,25 @@ class MiniMaxPlayer(Player):
         for r in range(game.get_rows()):
             row_array = [int(i) for i in list(board[r,:])]
             for c in range(game.get_cols()-3):
-                window = row_array[c:c+WINDOW_LENGTH]
+                window = row_array[c:c+window_len]
                 score += self.evaluate_window(window, game)
 
         ## Score Vertical
         for c in range(game.get_cols()):
             col_array = [int(i) for i in list(board[:,c])]
             for r in range(game.get_rows()-3):
-                window = col_array[r:r+WINDOW_LENGTH]
+                window = col_array[r:r+window_len]
                 score += self.evaluate_window(window, game)
 
         ## Score posiive sloped diagonal
         for r in range(game.get_rows()-3):
             for c in range(game.get_cols()-3):
-                window = [board[r+i][c+i] for i in range(WINDOW_LENGTH)]
+                window = [board[r+i][c+i] for i in range(window_len)]
                 score += self.evaluate_window(window, game)
 
         for r in range(game.get_rows()-3):
             for c in range(game.get_cols()-3):
-                window = [board[r+3-i][c+i] for i in range(WINDOW_LENGTH)]
+                window = [board[r+3-i][c+i] for i in range(window_len)]
                 score += self.evaluate_window(window, game)
 
         return score
@@ -97,7 +98,7 @@ class MiniMaxPlayer(Player):
 # Class ConnectFourGame
 #============================================================================
 class ConnectFourGame(Game):
-    def __init__(self, player1, player2, rows = 6, cols = 7):
+    def __init__(self, player1, player2, rows = 6, cols = 7, window_length = 4):
         super().__init__("Connect Four")
         self.board = np.zeros((rows, cols))
         self.undo_stack = LifoQueue()
@@ -105,6 +106,7 @@ class ConnectFourGame(Game):
         self.player2 = player2
         self.rows = rows
         self.cols = cols
+        self.window_length = window_length
 
     def get_opponent(self, playerId):
         return self.player2 if self.player1 == playerId else self.player1
@@ -179,3 +181,6 @@ class ConnectFourGame(Game):
 
     def get_cols(self):
         return self.cols
+
+    def get_window_length(self):
+        return self.window_length

@@ -1,7 +1,22 @@
 Python Play
 ===========
 
-A funny way to learn Python
+**A funny way to learn Python**
+
+The **ai** package contains an implementation of the minimax algorithm with alpha beta pruning. 
+It is implemented using an abstract *Game* class and can be used in various games, such as **Tic Tac Toe** and **Connect Four** featured in **examples**.
+
+.. image:: docs/tic_tac_toe.png
+   :alt: Tic Tac Toe screenshot
+   :width: 501px
+   :height: 662px
+   :scale: 20
+
+.. image:: docs/connect_four.png
+    :alt: Connect Four screenshot
+    :width: 874px
+    :height: 913px
+    :scale: 20
 
 Install
 -------
