@@ -8,15 +8,9 @@ It is implemented using an abstract *Game* class and can be used in various game
 
 .. image:: docs/tic_tac_toe.png
    :alt: Tic Tac Toe screenshot
-   :width: 501px
-   :height: 662px
-   :scale: 20
 
 .. image:: docs/connect_four.png
     :alt: Connect Four screenshot
-    :width: 874px
-    :height: 913px
-    :scale: 20
 
 Install
 -------
