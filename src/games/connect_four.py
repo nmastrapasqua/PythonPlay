@@ -13,7 +13,7 @@ EMPTY = 0
 PLAYER_PIECE = 1
 AI_PIECE = 2
 DRAW = 3
-WIN_SCORE = 100000000000000
+WIN_SCORE = 100000
 
 #============================================================================
 # MiniMaxPlayer class for Connect Four Game
@@ -30,69 +30,28 @@ class MiniMaxPlayer(Player):
         return move
 
     def evaluate(self, game, actual_depth):
+        return self.eval1(game, actual_depth)
+
+    def eval1(self, game, actual_depth):
         opponentId = game.get_opponent(self.id)
+        fourInRow = 0
+        threeInRow = 0
+        twoInRow = 0
 
-        if game.check_win(self.id):
-            return WIN_SCORE
-
-        elif game.check_win(opponentId):
+        if game.check_win(opponentId):
             return -WIN_SCORE
 
-        else:
-            return self.score_position(game)
+        for window in game.get_windows():
+            fourInRow += self.count(window, self.id, 4)
+            threeInRow += self.count(window, self.id, 3)
+            twoInRow += self.count(window, self.id, 2)
+            
+        return WIN_SCORE*fourInRow + 100*threeInRow + twoInRow
 
-    def score_position(self, game):
-        board = game.get_board()
-        score = 0
-        window_len = game.get_window_length()
-
-        ## Score center column
-        center_array = [int(i) for i in list(board[:, game.get_cols()//2])]
-        center_count = center_array.count(self.id)
-        score += center_count * 3
-
-        ## Score Horizontal
-        for r in range(game.get_rows()):
-            row_array = [int(i) for i in list(board[r,:])]
-            for c in range(game.get_cols()-3):
-                window = row_array[c:c+window_len]
-                score += self.evaluate_window(window, game)
-
-        ## Score Vertical
-        for c in range(game.get_cols()):
-            col_array = [int(i) for i in list(board[:,c])]
-            for r in range(game.get_rows()-3):
-                window = col_array[r:r+window_len]
-                score += self.evaluate_window(window, game)
-
-        ## Score posiive sloped diagonal
-        for r in range(game.get_rows()-3):
-            for c in range(game.get_cols()-3):
-                window = [board[r+i][c+i] for i in range(window_len)]
-                score += self.evaluate_window(window, game)
-
-        for r in range(game.get_rows()-3):
-            for c in range(game.get_cols()-3):
-                window = [board[r+3-i][c+i] for i in range(window_len)]
-                score += self.evaluate_window(window, game)
-
-        return score
-
-    def evaluate_window(self, window, game):
-        score = 0
-        opp_piece = game.get_opponent(self.id)
-
-        if window.count(self.id) == 4:
-            score += 100
-        elif window.count(self.id) == 3 and window.count(EMPTY) == 1:
-            score += 5
-        elif window.count(self.id) == 2 and window.count(EMPTY) == 2:
-            score += 2
-
-        if window.count(opp_piece) == 3 and window.count(EMPTY) == 1:
-            score -= 4
-
-        return score
+    def count(self, window, playerId, size):
+        if window.count(playerId) == size and window.count(EMPTY) == len(window) - size:
+            return 1
+        return 0
 
 #============================================================================
 # Class ConnectFourGame
@@ -100,7 +59,7 @@ class MiniMaxPlayer(Player):
 class ConnectFourGame(Game):
     def __init__(self, player1, player2, rows = 6, cols = 7, window_length = 4):
         super().__init__("Connect Four")
-        self.board = np.zeros((rows, cols))
+        self.board = np.zeros((rows, cols), dtype=int)
         self.undo_stack = LifoQueue()
         self.player1 = player1
         self.player2 = player2
@@ -115,29 +74,9 @@ class ConnectFourGame(Game):
         return self.board
 
     def check_win(self, playerId):
-        # Check horizontal locations for win
-        for c in range(self.cols-3):
-            for r in range(self.rows):
-                if self.board[r][c] == playerId and self.board[r][c+1] == playerId and self.board[r][c+2] == playerId and self.board[r][c+3] == playerId:
-                    return True
-
-        # Check vertical locations for win
-        for c in range(self.cols):
-            for r in range(self.rows-3):
-                if self.board[r][c] == playerId and self.board[r+1][c] == playerId and self.board[r+2][c] == playerId and self.board[r+3][c] == playerId:
-                    return True
-
-        # Check positively sloped diaganols
-        for c in range(self.cols-3):
-            for r in range(self.rows-3):
-                if self.board[r][c] == playerId and self.board[r+1][c+1] == playerId and self.board[r+2][c+2] == playerId and self.board[r+3][c+3] == playerId:
-                    return True
-
-        # Check negatively sloped diaganols
-        for c in range(self.cols-3):
-            for r in range(3, self.rows):
-                if self.board[r][c] == playerId and self.board[r-1][c+1] == playerId and self.board[r-2][c+2] == playerId and self.board[r-3][c+3] == playerId:
-                    return True
+        for window in self.get_windows():
+            if window.count(playerId) == self.window_length:
+                return True
 
         return False
 
@@ -182,5 +121,33 @@ class ConnectFourGame(Game):
     def get_cols(self):
         return self.cols
 
-    def get_window_length(self):
-        return self.window_length
+    def get_center_column(self):
+        return [int(i) for i in list(self.board[:, self.cols//2])]
+
+    def get_windows(self):
+        windows = []
+
+        ## Score Horizontal
+        for r in range(self.rows):
+            row_array = [int(i) for i in list(self.board[r,:])]
+            for c in range(self.cols-3):
+                windows.append(row_array[c:c+self.window_length])
+
+        ## Score Vertical
+        for c in range(self.cols):
+            col_array = [int(i) for i in list(self.board[:,c])]
+            for r in range(self.rows-3):
+                windows.append(col_array[r:r+self.window_length])
+
+        ## Score posiive sloped diagonal
+        for r in range(self.rows-3):
+            for c in range(self.cols-3):
+                windows.append([self.board[r+i][c+i] for i in range(self.window_length)])
+                
+
+        for r in range(self.rows-3):
+            for c in range(self.cols-3):
+               windows.append([self.board[r+3-i][c+i] for i in range(self.window_length)])
+
+        return windows
+                

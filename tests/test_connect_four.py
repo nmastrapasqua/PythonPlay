@@ -115,13 +115,56 @@ class TestConnectFourClass(unittest.TestCase):
         self.assertEqual(self.game.check_win(AI_PIECE), False)
         self.assertEqual(self.game.check_win(PLAYER_PIECE), True)
 
+        for i in range(10):
+            self.game.undo()
+
+        self.assertEqual(self.game.check_win(AI_PIECE), False)
+        self.assertEqual(self.game.check_win(PLAYER_PIECE), False)
+
+        self.game.do_move(6, PLAYER_PIECE)
+        self.game.do_move(6, PLAYER_PIECE)
+        self.game.do_move(6, PLAYER_PIECE)
+        self.game.do_move(6, AI_PIECE)
+
+        self.game.do_move(5, PLAYER_PIECE)
+        self.game.do_move(5, PLAYER_PIECE)
+        self.game.do_move(5, AI_PIECE)
+
+        self.game.do_move(4, PLAYER_PIECE)
+        self.game.do_move(4, AI_PIECE)
+
+        self.game.do_move(3, AI_PIECE)
+
+        self.assertEqual(self.game.check_win(AI_PIECE), True)
+        self.assertEqual(self.game.check_win(PLAYER_PIECE), False)
+
     def test_evaluate(self):
         self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 0)
 
         self.game.do_move(3, self.aiPlayer.get_id())
-        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 3)
+        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 0)
         self.game.do_move(3, self.aiPlayer.get_id())
-        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 8)
+        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 1)
+
+        self.game.undo()
+        self.game.undo()
+
+        self.game.do_move(6, AI_PIECE)
+        self.game.do_move(6, AI_PIECE)
+        self.game.do_move(6, AI_PIECE)
+        self.game.do_move(6, PLAYER_PIECE)
+
+        self.game.do_move(5, AI_PIECE)
+        self.game.do_move(5, AI_PIECE)
+        self.game.do_move(5, PLAYER_PIECE)
+
+        self.game.do_move(4, AI_PIECE)
+        self.game.do_move(4, PLAYER_PIECE)
+
+        self.game.do_move(2, AI_PIECE)
+        self.game.do_move(2, AI_PIECE)
+
+        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 203)
 
 if __name__ == '__main__':
     unittest.main()

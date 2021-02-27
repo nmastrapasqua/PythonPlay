@@ -1,6 +1,9 @@
+#=====================================================================
+# Play with:
+# https://www.helpfulgames.com/subjects/brain-training/connect-four.html
+#=====================================================================
 from games.connect_four import ConnectFourGame, MiniMaxPlayer, DRAW, AI_PIECE, PLAYER_PIECE
 
-import numpy as np
 import random
 import pygame
 from pygame.locals import *
@@ -11,6 +14,8 @@ BLUE = (0,0,255)
 BLACK = (0,0,0)
 RED = (255,0,0)
 YELLOW = (255,255,0)
+GREEN = (0, 200, 0 )
+LABEL_COLOR = GREEN
 
 ROW_COUNT = 6
 COLUMN_COUNT = 7
@@ -18,7 +23,9 @@ WINDOW_LENGTH = 4
 
 PLAYER = 0
 AI = 1
-DIFFICULTY = 2
+DIFFICULTY = 3
+
+PLAYER_COLOR = {PLAYER_PIECE: YELLOW, AI_PIECE: RED}
 
 computerPlayer = MiniMaxPlayer(AI_PIECE, DIFFICULTY)
 game = None
@@ -38,7 +45,7 @@ RADIUS = int(SQUARESIZE/2 - 5)
 screen = pygame.display.set_mode(size)
 pygame.display.update()
 
-myfont = pygame.font.SysFont("monospace", 75)
+myfont = pygame.font.SysFont("Arial", 48)
 
 def draw_board(game):
     board = game.get_board()    
@@ -50,20 +57,27 @@ def draw_board(game):
     for c in range(game.get_cols()):
         for r in range(game.get_rows()):		
             if board[r][c] == PLAYER_PIECE:
-                pygame.draw.circle(screen, RED, (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
+                pygame.draw.circle(screen, PLAYER_COLOR[PLAYER_PIECE], (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
             elif board[r][c] == AI_PIECE: 
-                pygame.draw.circle(screen, YELLOW, (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
+                pygame.draw.circle(screen, PLAYER_COLOR[AI_PIECE], (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
 
     pygame.display.update()
 
 def reset_game(): 
     global turn, game
     turn = random.randint(PLAYER, AI)
+    #turn = PLAYER
+    #turn = AI
     game = ConnectFourGame(AI_PIECE, PLAYER_PIECE, ROW_COUNT, COLUMN_COUNT, WINDOW_LENGTH)
     pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
 
 def getComputerMove():
+    label = myfont.render("Please wait...", 1, LABEL_COLOR)
+    screen.blit(label, (40,10))
+    pygame.display.update()
     computerPlayer.do_move(game)
+    pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
+    pygame.display.update()
 
 def getHumanMove():
     while True:
@@ -75,7 +89,7 @@ def getHumanMove():
             elif event.type == pygame.MOUSEMOTION:
                 pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
                 posx = event.pos[0]
-                pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE/2)), RADIUS)
+                pygame.draw.circle(screen, PLAYER_COLOR[PLAYER_PIECE], (posx, int(SQUARESIZE/2)), RADIUS)
                 pygame.display.update()
 
             elif event.type == MOUSEBUTTONDOWN:
@@ -99,7 +113,16 @@ def is_game_over():
 		return None
 
 def draw_win():
-    label = myfont.render("Player 1 wins!!", 1, RED)
+    winner = is_game_over()
+    if winner is None:
+        return
+
+    if winner == DRAW:
+        label = myfont.render("Draw !!", 1, LABEL_COLOR)
+    else:
+        text = 'Human' if winner == PLAYER_PIECE else 'Computer'
+        label = myfont.render(f"{text} wins!!", 1, LABEL_COLOR)
+
     screen.blit(label, (40,10))
 
 def main():
