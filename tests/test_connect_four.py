@@ -142,9 +142,9 @@ class TestConnectFourClass(unittest.TestCase):
         self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 0)
 
         self.game.do_move(3, self.aiPlayer.get_id())
-        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 0)
+        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 7)
         self.game.do_move(3, self.aiPlayer.get_id())
-        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 1)
+        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 17)
 
         self.game.undo()
         self.game.undo()
@@ -164,7 +164,7 @@ class TestConnectFourClass(unittest.TestCase):
         self.game.do_move(2, AI_PIECE)
         self.game.do_move(2, AI_PIECE)
 
-        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 203)
+        self.assertEqual(self.aiPlayer.evaluate(self.game, 0), 13)
 
 if __name__ == '__main__':
     unittest.main()

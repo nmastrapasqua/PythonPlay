@@ -13,7 +13,7 @@ EMPTY = 0
 PLAYER_PIECE = 1
 AI_PIECE = 2
 DRAW = 3
-WIN_SCORE = 100000
+WIN_SCORE = 10000000
 
 #============================================================================
 # MiniMaxPlayer class for Connect Four Game
@@ -30,7 +30,7 @@ class MiniMaxPlayer(Player):
         return move
 
     def evaluate(self, game, actual_depth):
-        return self.eval1(game, actual_depth)
+        return self.eval2(game, actual_depth)
 
     def eval1(self, game, actual_depth):
         opponentId = game.get_opponent(self.id)
@@ -48,10 +48,44 @@ class MiniMaxPlayer(Player):
             
         return WIN_SCORE*fourInRow + 100*threeInRow + twoInRow
 
+    def eval2(self, game, actual_depth):
+        opponentId = game.get_opponent(self.id)
+        freeInRow = 0
+        oppFreeInRow = 0
+        center = 0
+        oppCenter = 0
+        w1 = 1
+        w2 = 1
+
+        if game.check_win(self.id):
+            return WIN_SCORE
+
+        elif game.check_win(opponentId):
+            return -WIN_SCORE
+        
+        for array in game.get_center_columns():
+            center = array.count(self.id)
+            oppCenter = array.count(opponentId)
+
+        for window in game.get_windows():
+            freeInRow += self.countFree(window, self.id, opponentId)
+            oppFreeInRow += self.countFree(window, opponentId, self.id)
+
+        finalScore = (w1*freeInRow + w2*center)
+        finalScore -= (w1*oppFreeInRow + w2*oppCenter)
+            
+        return finalScore
+
     def count(self, window, playerId, size):
         if window.count(playerId) == size and window.count(EMPTY) == len(window) - size:
             return 1
         return 0
+
+    def countFree(self, window, playerId, opponentId):
+        countPlayer =  window.count(playerId)
+        countOpponent =  window.count(opponentId)
+        
+        return countPlayer if countOpponent == 0 else 0
 
 #============================================================================
 # Class ConnectFourGame
@@ -121,8 +155,15 @@ class ConnectFourGame(Game):
     def get_cols(self):
         return self.cols
 
-    def get_center_column(self):
-        return [int(i) for i in list(self.board[:, self.cols//2])]
+    def get_center_columns(self):
+        result = []
+        central_col = self.cols//2
+        left_central_col = central_col - 1
+        right_central_col = central_col + 1
+        result.append([int(i) for i in list(self.board[:, left_central_col])])
+        result.append([int(i) for i in list(self.board[:, central_col])])
+        result.append([int(i) for i in list(self.board[:, right_central_col])])
+        return result
 
     def get_windows(self):
         windows = []
