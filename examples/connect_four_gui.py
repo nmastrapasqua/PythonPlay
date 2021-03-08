@@ -1,6 +1,8 @@
 #=====================================================================
 # Play with:
 # https://www.helpfulgames.com/subjects/brain-training/connect-four.html
+# https://connect4.gamesolver.org/
+# https://www.mathsisfun.com/games/connect4.html
 #=====================================================================
 from games.connect_four import ConnectFourGame, MiniMaxPlayer, DRAW, AI_PIECE, PLAYER_PIECE
 
@@ -16,6 +18,7 @@ RED = (255,0,0)
 YELLOW = (255,255,0)
 GREEN = (0, 200, 0 )
 LABEL_COLOR = GREEN
+GRID_COLOR = BLUE
 
 ROW_COUNT = 6
 COLUMN_COUNT = 7
@@ -25,7 +28,7 @@ PLAYER = 0
 AI = 1
 DIFFICULTY = 3
 
-PLAYER_COLOR = {PLAYER_PIECE: YELLOW, AI_PIECE: RED}
+PLAYER_COLOR = {PLAYER_PIECE: RED, AI_PIECE: YELLOW}
 
 computerPlayer = MiniMaxPlayer(AI_PIECE, DIFFICULTY)
 game = None
@@ -51,7 +54,7 @@ def draw_board(game):
     board = game.get_board()    
     for c in range(game.get_cols()):
         for r in range(game.get_rows()):
-            pygame.draw.rect(screen, BLUE, (c*SQUARESIZE, r*SQUARESIZE+SQUARESIZE, SQUARESIZE, SQUARESIZE))
+            pygame.draw.rect(screen, GRID_COLOR, (c*SQUARESIZE, r*SQUARESIZE+SQUARESIZE, SQUARESIZE, SQUARESIZE))
             pygame.draw.circle(screen, BLACK, (int(c*SQUARESIZE+SQUARESIZE/2), int(r*SQUARESIZE+SQUARESIZE+SQUARESIZE/2)), RADIUS)
 	
     for c in range(game.get_cols()):
